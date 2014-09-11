@@ -24,7 +24,6 @@ app.use('/*', function(req, res) {
 	}
 	if(program.debug) {
 		console.log(req.method, url)
-		console.log(req.method);
 		if(req.method == 'POST') {
 			console.log(req.headers);
 			console.log(req.body);
