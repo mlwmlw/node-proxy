@@ -9,6 +9,7 @@
   "author": "mlwmlw@github",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.8.1",
     "commander": "^2.3.0",
     "express": "^4.9.0",
     "lru-cache": "^2.5.0",
