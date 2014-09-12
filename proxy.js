@@ -1,4 +1,6 @@
 var express = require('express');
+var http = require('http');
+var net = require('net');
 var parser = require('body-parser');
 var cache = require('lru-cache');
 var request = require('request');
@@ -14,6 +16,7 @@ program
 var app = express();
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: false }));
+
 app.use('/*', function(req, res) {
 	var url = '';
 	if(program.reverse) {
@@ -41,4 +44,21 @@ app.use('/*', function(req, res) {
 		console.log(e);
 	}
 });
-app.listen(8080);
+var server = http.createServer(app).listen(program.port);
+server.addListener('connect', function(req, socket, bodyhead) {
+	var proxy = new net.Socket();
+	var hostport = req.url.split(":");
+	proxy.connect(hostport[1], hostport[0], function() {
+		if(program.debug) {
+			console.log(req.url);
+			console.log(req.headers);
+		}
+		socket.write("HTTP/" + req.httpVersion + " 200 Connection established\r\n\r\n");
+		proxy.pipe(socket);
+	});
+	socket.pipe(proxy);
+	
+});
+console.log('proxy server listen on port ' + program.port);
+if(program.debug)
+	console.log('debug mode');
